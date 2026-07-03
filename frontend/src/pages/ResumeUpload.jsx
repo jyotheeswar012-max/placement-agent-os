@@ -1,9 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { Upload, FileText, CheckCircle, AlertCircle, Sparkles, Copy, Download, ChevronDown, ChevronUp } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-// ── helpers ────────────────────────────────────────────────────────────────
 const SKILL_POOL = [
   'Python','JavaScript','TypeScript','React','Node.js','FastAPI','Django','Flask',
   'SQL','PostgreSQL','MongoDB','Redis','Docker','Kubernetes','AWS','GCP','Azure',
@@ -22,67 +20,63 @@ function mockAnalyze(resumeText, jdText) {
   const jdSkills     = extractSkillsFromText(jdText)
   const matched      = resumeSkills.filter(s => jdSkills.includes(s))
   const missing      = jdSkills.filter(s => !resumeSkills.includes(s))
-  const extra        = resumeSkills.filter(s => !jdSkills.includes(s))
-
-  const jdWords = jdText ? jdText.split(/\s+/).length : 0
-  const matchPct = jdSkills.length > 0 ? Math.round((matched.length / jdSkills.length) * 100) : 72
-  const atsScore = Math.min(99, Math.round(matchPct * 0.7 + 30 + Math.random() * 8))
-  const resumeScore = Math.min(99, Math.round(matchPct * 0.5 + 50 + Math.random() * 10))
-
-  const suggestions = []
+  const jdWords      = jdText ? jdText.split(/\s+/).length : 0
+  const matchPct     = jdSkills.length > 0 ? Math.round((matched.length / jdSkills.length) * 100) : 72
+  const atsScore     = Math.min(99, Math.round(matchPct * 0.7 + 30 + Math.random() * 8))
+  const resumeScore  = Math.min(99, Math.round(matchPct * 0.5 + 50 + Math.random() * 10))
+  const suggestions  = []
   if (missing.length > 0) suggestions.push(`Add missing keywords: ${missing.slice(0,4).join(', ')}`)
   if (!resumeText.match(/\d+%|\d+x|\d+ (users|projects|systems)/i)) suggestions.push('Add quantified achievements (e.g. "improved accuracy by 18%")')
   if (!resumeText.toLowerCase().includes('github')) suggestions.push('Include GitHub profile link')
   if (!resumeText.toLowerCase().includes('bachelor') && !resumeText.toLowerCase().includes('b.tech')) suggestions.push('Add education section with degree and institution')
   if (jdWords > 0 && matched.length < 3) suggestions.push('Rewrite summary to mirror JD language')
-
-  return { resumeScore, atsScore, matchPct, resumeSkills, jdSkills, matched, missing, extra, suggestions }
+  return { resumeScore, atsScore, matchPct, resumeSkills, jdSkills, matched, missing, suggestions }
 }
 
 function buildTailoredResume(resumeText, jdText, result) {
-  const name      = resumeText.match(/^([A-Z][a-z]+ [A-Z][a-z]+)/m)?.[1] || 'Your Name'
-  const email     = resumeText.match(/[\w.+-]+@[\w-]+\.[\w.]+/)?.[0] || 'you@email.com'
-  const phone     = resumeText.match(/(\+91[\s-]?)?[6-9]\d{9}/)?.[0] || '+91 9XXXXXXXXX'
-  const allSkills = [...new Set([...result.resumeSkills, ...result.missing])].slice(0, 18)
-
-  const roleGuess = jdText.match(/(software engineer|data scientist|ml engineer|product manager|devops|full stack|backend|frontend)/i)?.[1] || 'Software Engineer'
-
+  const name    = resumeText.match(/^([A-Z][a-z]+ [A-Z][a-z]+)/m)?.[1] || 'Your Name'
+  const email   = resumeText.match(/[\w.+-]+@[\w-]+\.[\w.]+/)?.[0] || 'you@email.com'
+  const phone   = resumeText.match(/(\+91[\s-]?)?[6-9]\d{9}/)?.[0] || '+91 9XXXXXXXXX'
+  const all     = [...new Set([...result.resumeSkills, ...result.missing])].slice(0, 18)
+  const role    = jdText.match(/(software engineer|data scientist|ml engineer|product manager|devops|full stack|backend|frontend)/i)?.[1] || 'Software Engineer'
   return `${name}
 ${email}  |  ${phone}  |  github.com/profile  |  linkedin.com/in/profile
 
-───────────────────────────────────────────────────────────────────────────
+${'─'.repeat(76)}
 PROFESSIONAL SUMMARY
-───────────────────────────────────────────────────────────────────────────
-Results-driven ${roleGuess} with hands-on experience in ${allSkills.slice(0,4).join(', ')}.
+${'─'.repeat(76)}
+Results-driven ${role} with hands-on experience in ${all.slice(0,4).join(', ')}.
 Passionate about building scalable solutions and delivering measurable impact.
-Seeking to leverage technical expertise and problem-solving skills in a high-growth environment.
-───────────────────────────────────────────────────────────────────────────
+Seeking to leverage technical expertise in a high-growth environment.
+
+${'─'.repeat(76)}
 SKILLS  [Tailored to JD]
-───────────────────────────────────────────────────────────────────────────
-Languages & Frameworks : ${allSkills.slice(0,6).join(' · ')}
-Data & ML              : ${allSkills.slice(6,12).join(' · ')}
-Infrastructure         : ${allSkills.slice(12,18).join(' · ')}
-───────────────────────────────────────────────────────────────────────────
+${'─'.repeat(76)}
+Languages & Frameworks : ${all.slice(0,6).join(' · ')}
+Data & ML              : ${all.slice(6,12).join(' · ')}
+Infrastructure         : ${all.slice(12,18).join(' · ')}
+
+${'─'.repeat(76)}
 EXPERIENCE
-───────────────────────────────────────────────────────────────────────────
+${'─'.repeat(76)}
 [Add your experience here]
-• Led development of [X] using ${result.matched.slice(0,2).join(' and ')} — improved performance by 30%
-• Collaborated with cross-functional teams on ${roleGuess} initiatives impacting 10,000+ users
+• Led development of [X] using ${(result.matched.slice(0,2)).join(' and ')} — improved performance by 30%
+• Collaborated with cross-functional teams on ${role} initiatives impacting 10,000+ users
 • Automated ${result.matched[0] || 'workflow'} pipelines, reducing manual effort by 40%
-───────────────────────────────────────────────────────────────────────────
+
+${'─'.repeat(76)}
 EDUCATION
-───────────────────────────────────────────────────────────────────────────
-B.Tech / [Your Degree]  |  [University Name]  |  20XX – 20XX
-CGPA: X.X / 10
-───────────────────────────────────────────────────────────────────────────
+${'─'.repeat(76)}
+B.Tech / [Your Degree]  |  [University Name]  |  20XX – 20XX  |  CGPA: X.X/10
+
+${'─'.repeat(76)}
 PROJECTS
-───────────────────────────────────────────────────────────────────────────
+${'─'.repeat(76)}
 • [Project Name] — Built using ${result.matched.slice(0,3).join(', ')} | github.com/your-project
 • [Project Name] — ${result.missing.slice(0,2).join(' + ')} integration | Deployed on AWS
 `
 }
 
-// ── ScoreBadge ────────────────────────────────────────────────────────────────
 function ScoreRing({ score, label, color }) {
   const r = 30, c = 2 * Math.PI * r
   const [dash, setDash] = useState(0)
@@ -104,25 +98,24 @@ function ScoreRing({ score, label, color }) {
 }
 
 const S = {
-  wrap:    { minHeight: '100vh', background: '#020817', color: '#e2e8f0', fontFamily: "'Inter',system-ui,sans-serif", padding: '24px 20px' },
-  card:    { background: 'rgba(15,23,42,0.85)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '18px 20px', marginBottom: 16 },
-  label:   { fontSize: 9, fontWeight: 800, color: 'rgba(100,116,139,1)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 },
-  chip:    (color) => ({ background: `${color}15`, color, border: `1px solid ${color}40`, borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4, margin: '3px' }),
-  btn:     (bg, color='#fff') => ({ background: bg, color, border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8, transition: 'opacity 0.2s' }),
-  textarea:{ width: '100%', background: 'rgba(3,7,18,0.8)', border: '1px solid rgba(30,41,59,1)', borderRadius: 10, padding: '12px', fontSize: 12, color: '#e2e8f0', resize: 'vertical', fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' },
+  wrap:     { minHeight: '100vh', background: '#020817', color: '#e2e8f0', fontFamily: "'Inter',system-ui,sans-serif", padding: '24px 20px' },
+  card:     { background: 'rgba(15,23,42,0.85)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '18px 20px', marginBottom: 16 },
+  label:    { fontSize: 9, fontWeight: 800, color: 'rgba(100,116,139,1)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 },
+  chip:     (color) => ({ background: `${color}15`, color, border: `1px solid ${color}40`, borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4, margin: '3px' }),
+  btn:      (bg, color='#fff') => ({ background: bg, color, border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8, transition: 'opacity 0.2s' }),
+  textarea: { width: '100%', background: 'rgba(3,7,18,0.8)', border: '1px solid rgba(30,41,59,1)', borderRadius: 10, padding: '12px', fontSize: 12, color: '#e2e8f0', resize: 'vertical', fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' },
 }
 
 export default function ResumeUpload() {
-  const [file, setFile]           = useState(null)
+  const [file, setFile]             = useState(null)
   const [resumeText, setResumeText] = useState('')
-  const [jdText, setJdText]       = useState('')
-  const [result, setResult]       = useState(null)
-  const [tailored, setTailored]   = useState('')
-  const [loading, setLoading]     = useState(false)
-  const [tailoring, setTailoring] = useState(false)
-  const [tab, setTab]             = useState('analyze') // 'analyze' | 'tailor'
+  const [jdText, setJdText]         = useState('')
+  const [result, setResult]         = useState(null)
+  const [tailored, setTailored]     = useState('')
+  const [loading, setLoading]       = useState(false)
+  const [tailoring, setTailoring]   = useState(false)
+  const [tab, setTab]               = useState('analyze')
   const [showTailored, setShowTailored] = useState(false)
-  const textRef = useRef(null)
 
   const onDrop = useCallback(accepted => {
     if (!accepted[0]) return
@@ -144,49 +137,42 @@ export default function ResumeUpload() {
     if (!resumeText.trim()) { toast.error('Paste resume text or upload a .txt file'); return }
     setLoading(true)
     await new Promise(r => setTimeout(r, 1400))
-    const res = mockAnalyze(resumeText, jdText)
-    setResult(res)
+    setResult(mockAnalyze(resumeText, jdText))
     setLoading(false)
     toast.success('Analysis complete!')
   }
 
   const tailorResume = async () => {
-    if (!result) { toast.error('Run analysis first'); return }
+    if (!result) { await analyze(); }
     if (!jdText.trim()) { toast.error('Paste a Job Description first'); return }
     setTailoring(true)
-    await new Promise(r => setTimeout(r, 1800))
-    setTailored(buildTailoredResume(resumeText, jdText, result))
+    await new Promise(r => setTimeout(r, 1600))
+    const res = result || mockAnalyze(resumeText, jdText)
+    setTailored(buildTailoredResume(resumeText, jdText, res))
     setShowTailored(true)
     setTailoring(false)
     toast.success('Resume tailored to JD ✔️')
   }
 
-  const copyTailored = () => {
-    navigator.clipboard.writeText(tailored)
-    toast.success('Copied to clipboard!')
-  }
-
+  const copyTailored = () => { navigator.clipboard.writeText(tailored); toast.success('Copied!') }
   const downloadTailored = () => {
-    const blob = new Blob([tailored], { type: 'text/plain' })
     const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = 'tailored_resume.txt'
-    a.click()
+    a.href = URL.createObjectURL(new Blob([tailored], { type: 'text/plain' }))
+    a.download = 'tailored_resume.txt'; a.click()
     toast.success('Downloaded!')
   }
 
   return (
     <div style={S.wrap}>
       <style>{`
-        @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-        .fade-up { animation: fadeUp 0.45s ease }
-        textarea:focus { border-color: #a78bfa !important; box-shadow: 0 0 0 3px rgba(167,139,250,0.12) }
-        ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        .fade-up{animation:fadeUp 0.45s ease}
+        textarea:focus{border-color:#a78bfa!important;box-shadow:0 0 0 3px rgba(167,139,250,0.12)}
+        input:focus{border-color:#a78bfa!important;outline:none}
+        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
       `}</style>
 
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
-
-        {/* Header */}
         <div style={{ marginBottom: 24 }}>
           <h1 style={{ fontSize: 22, fontWeight: 900, margin: 0, background: 'linear-gradient(90deg,#e2e8f0,#a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
             📄 Resume Analyzer & Tailor
@@ -200,16 +186,13 @@ export default function ResumeUpload() {
             <button key={t} onClick={() => setTab(t)} style={{
               ...S.btn(tab===t ? 'linear-gradient(135deg,rgba(124,58,237,0.5),rgba(56,189,248,0.3))' : 'rgba(15,23,42,0.6)'),
               border: `1px solid ${tab===t ? 'rgba(167,139,250,0.5)' : 'rgba(30,41,59,1)'}`,
-              color: tab===t ? '#e2e8f0' : 'rgba(100,116,139,1)',
-              fontSize: 12, padding: '8px 16px',
+              color: tab===t ? '#e2e8f0' : 'rgba(100,116,139,1)', fontSize: 12, padding: '8px 16px',
             }}>{l}</button>
           ))}
         </div>
 
-        {/* ── ANALYZE TAB ── */}
         {tab === 'analyze' && (
           <div className="fade-up">
-            {/* Upload zone */}
             <div {...getRootProps()} style={{
               border: `2px dashed ${isDragActive ? '#a78bfa' : 'rgba(30,41,59,1)'}`,
               borderRadius: 14, padding: '32px 20px', textAlign: 'center', cursor: 'pointer',
@@ -218,9 +201,7 @@ export default function ResumeUpload() {
             }}>
               <input {...getInputProps()} />
               <div style={{ fontSize: 28, marginBottom: 8 }}>📁</div>
-              <p style={{ fontSize: 13, color: '#e2e8f0', margin: 0 }}>
-                {isDragActive ? 'Drop it!' : 'Drag & drop resume (PDF/TXT) or click to browse'}
-              </p>
+              <p style={{ fontSize: 13, color: '#e2e8f0', margin: 0 }}>{isDragActive ? 'Drop it!' : 'Drag & drop resume (PDF/TXT) or click to browse'}</p>
               <p style={{ fontSize: 10, color: 'rgba(71,85,105,1)', marginTop: 4 }}>PDF, DOCX, TXT · Max 5MB</p>
             </div>
 
@@ -235,15 +216,13 @@ export default function ResumeUpload() {
               </div>
             )}
 
-            {/* Resume text paste */}
             <div style={S.card}>
               <div style={S.label}>Resume Text (paste here or auto-loaded from file)</div>
-              <textarea ref={textRef} value={resumeText} onChange={e => setResumeText(e.target.value)}
-                rows={7} placeholder="Paste your resume text here... (skills, experience, education, etc.)"
+              <textarea value={resumeText} onChange={e => setResumeText(e.target.value)}
+                rows={7} placeholder="Paste your resume text here..."
                 style={S.textarea} />
             </div>
 
-            {/* JD paste */}
             <div style={S.card}>
               <div style={S.label}>⚡ Job Description (optional — paste for JD-specific scoring)</div>
               <textarea value={jdText} onChange={e => setJdText(e.target.value)}
@@ -254,19 +233,15 @@ export default function ResumeUpload() {
             <button onClick={analyze} disabled={loading} style={{
               ...S.btn('linear-gradient(135deg,#4c1d95,#1e40af)'),
               opacity: loading ? 0.6 : 1, marginBottom: 20, width: '100%', justifyContent: 'center',
-            }}>
-              {loading ? <>🔄 Analyzing…</> : <>🔍 Analyze Resume</>}
-            </button>
+            }}>{loading ? '🔄 Analyzing…' : '🔍 Analyze Resume'}</button>
 
-            {/* Results */}
             {result && (
               <div className="fade-up">
-                {/* Score cards */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 16 }}>
                   {[
-                    { score: result.resumeScore, label: 'Resume Score',  color: '#a78bfa' },
-                    { score: result.atsScore,    label: 'ATS Score',     color: '#38bdf8' },
-                    { score: result.matchPct,    label: 'JD Match',      color: jdText ? '#4ade80' : '#475569' },
+                    { score: result.resumeScore, label: 'Resume Score', color: '#a78bfa' },
+                    { score: result.atsScore,    label: 'ATS Score',    color: '#38bdf8' },
+                    { score: result.matchPct,    label: 'JD Match',     color: jdText ? '#4ade80' : '#475569' },
                   ].map(s => (
                     <div key={s.label} style={{ ...S.card, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 10px', margin: 0 }}>
                       <ScoreRing score={s.score} label={s.label} color={s.color} />
@@ -274,7 +249,6 @@ export default function ResumeUpload() {
                   ))}
                 </div>
 
-                {/* Skill chips */}
                 <div style={S.card}>
                   <div style={S.label}>✔ Skills Detected ({result.resumeSkills.length})</div>
                   <div>{result.resumeSkills.map(s => <span key={s} style={S.chip('#4ade80')}>✔ {s}</span>)}</div>
@@ -286,7 +260,6 @@ export default function ResumeUpload() {
                   )}
                 </div>
 
-                {/* Suggestions */}
                 {result.suggestions.length > 0 && (
                   <div style={{ ...S.card, border: '1px solid rgba(251,191,36,0.25)' }}>
                     <div style={S.label}>💡 Improvement Suggestions</div>
@@ -298,7 +271,6 @@ export default function ResumeUpload() {
                   </div>
                 )}
 
-                {/* CTA to tailor */}
                 <button onClick={() => setTab('tailor')} style={{ ...S.btn('linear-gradient(135deg,rgba(74,222,128,0.3),rgba(56,189,248,0.3))'), border: '1px solid rgba(74,222,128,0.4)', color: '#4ade80', width: '100%', justifyContent: 'center', marginTop: 4 }}>
                   ✨ Tailor resume to this JD →
                 </button>
@@ -307,7 +279,6 @@ export default function ResumeUpload() {
           </div>
         )}
 
-        {/* ── TAILOR TAB ── */}
         {tab === 'tailor' && (
           <div className="fade-up">
             <div style={S.card}>
@@ -318,39 +289,25 @@ export default function ResumeUpload() {
             <div style={S.card}>
               <div style={S.label}>Step 2 — paste the target job description</div>
               <textarea value={jdText} onChange={e => setJdText(e.target.value)}
-                rows={6} placeholder="Paste the job description here… The AI will mirror its language and keywords in your tailored resume." style={S.textarea} />
+                rows={6} placeholder="Paste the job description here… The AI will mirror its language and keywords." style={S.textarea} />
             </div>
+            <button onClick={tailorResume} disabled={tailoring} style={{
+              ...S.btn('linear-gradient(135deg,#581c87,#1e3a8a)'),
+              width: '100%', justifyContent: 'center', marginBottom: 20, opacity: tailoring ? 0.6 : 1,
+            }}>{tailoring ? '⏳ Tailoring…' : '✨ Generate Tailored Resume'}</button>
 
-            <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
-              {!result && (
-                <button onClick={analyze} disabled={loading} style={{ ...S.btn('rgba(30,41,59,0.9)'), border: '1px solid rgba(51,65,85,1)', flex: 1, justifyContent: 'center', fontSize: 12, opacity: loading?0.6:1 }}>
-                  {loading ? '🔄 Analyzing…' : '🔍 Run Analysis First'}
-                </button>
-              )}
-              <button onClick={tailorResume} disabled={tailoring} style={{ ...S.btn('linear-gradient(135deg,#581c87,#1e3a8a)'), flex: 1, justifyContent: 'center', opacity: tailoring?0.6:1 }}>
-                {tailoring ? <>⏳ Tailoring…</> : <>✨ Generate Tailored Resume</>}
-              </button>
-            </div>
-
-            {/* Tailored output */}
             {showTailored && tailored && (
               <div style={{ ...S.card, border: '1px solid rgba(167,139,250,0.3)', animation: 'fadeUp 0.45s ease' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <div style={S.label}>✨ Tailored Resume (ready to edit & send)</div>
+                  <div style={S.label}>✨ Tailored Resume (edit & send)</div>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={copyTailored} style={{ ...S.btn('rgba(30,41,59,0.9)'), border: '1px solid rgba(51,65,85,1)', fontSize: 11, padding: '6px 12px' }}>
-                      📋 Copy
-                    </button>
-                    <button onClick={downloadTailored} style={{ ...S.btn('rgba(30,41,59,0.9)'), border: '1px solid rgba(51,65,85,1)', fontSize: 11, padding: '6px 12px' }}>
-                      ⬇ Download .txt
-                    </button>
+                    <button onClick={copyTailored} style={{ ...S.btn('rgba(30,41,59,0.9)'), border: '1px solid rgba(51,65,85,1)', fontSize: 11, padding: '6px 12px' }}>📋 Copy</button>
+                    <button onClick={downloadTailored} style={{ ...S.btn('rgba(30,41,59,0.9)'), border: '1px solid rgba(51,65,85,1)', fontSize: 11, padding: '6px 12px' }}>⬇ Download</button>
                   </div>
                 </div>
                 <textarea value={tailored} onChange={e => setTailored(e.target.value)}
                   rows={24} style={{ ...S.textarea, fontFamily: 'monospace', fontSize: 11, lineHeight: 1.7 }} />
-                <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(71,85,105,1)' }}>
-                  ⚠️ Review and personalise before sending. Fill in the bracketed placeholders.
-                </div>
+                <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(71,85,105,1)' }}>⚠️ Review and personalise before sending. Fill in the bracketed placeholders.</div>
               </div>
             )}
           </div>

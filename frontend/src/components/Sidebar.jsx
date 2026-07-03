@@ -2,17 +2,18 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Briefcase, FileText,
-  ClipboardList, MessageSquare, TrendingUp, Target
+  ClipboardList, MessageSquare, TrendingUp, Target, Users
 } from 'lucide-react'
 import clsx from 'clsx'
 
 const NAV = [
-  { to: '/',            icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/jobs',        icon: Briefcase,        label: 'Jobs' },
-  { to: '/resume',      icon: FileText,         label: 'Resume' },
-  { to: '/applications',icon: ClipboardList,    label: 'Applications' },
-  { to: '/interview',   icon: MessageSquare,    label: 'Interview Prep' },
-  { to: '/skill-gap',   icon: TrendingUp,       label: 'Skill Gap' },
+  { to: '/',              icon: LayoutDashboard, label: 'Dashboard'     },
+  { to: '/jobs',          icon: Briefcase,       label: 'Jobs'          },
+  { to: '/resume',        icon: FileText,        label: 'Resume'        },
+  { to: '/applications',  icon: ClipboardList,   label: 'Applications'  },
+  { to: '/interview',     icon: MessageSquare,   label: 'Interview Prep'},
+  { to: '/skill-gap',     icon: TrendingUp,      label: 'Skill Gap'     },
+  { to: '/agent-quorum',  icon: Users,           label: 'Agent Quorum'  },
 ]
 
 export default function Sidebar({ open }) {
