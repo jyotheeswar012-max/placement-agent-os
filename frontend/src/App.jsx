@@ -8,6 +8,7 @@ import ResumeUpload from './pages/ResumeUpload'
 import Applications from './pages/Applications'
 import InterviewPrep from './pages/InterviewPrep'
 import SkillGap from './pages/SkillGap'
+import AgentQuorum from './pages/AgentQuorum'
 import Login from './pages/Login'
 import { AuthProvider, useAuth } from './context/AuthContext'
 
@@ -35,6 +36,7 @@ export default function App() {
             <Route path="applications" element={<Applications />} />
             <Route path="interview" element={<InterviewPrep />} />
             <Route path="skill-gap" element={<SkillGap />} />
+            <Route path="agent-quorum" element={<AgentQuorum />} />
           </Route>
         </Routes>
       </BrowserRouter>
