@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1,
+    "title": "Data Scientist",
+    "company": "Google",
+    "required_skills": ["python", "machine learning", "sql", "pandas", "tensorflow"],
+    "location": "Bangalore",
+    "salary_min": 1200000,
+    "salary_max": 2500000,
+    "job_type": "Full-time",
+    "description": "Build ML models at scale using Python and TensorFlow. Strong SQL and analytics required."
+  },
+  {
+    "id": 2,
+    "title": "Backend Developer",
+    "company": "Razorpay",
+    "required_skills": ["python", "fastapi", "postgresql", "docker", "redis"],
+    "location": "Bangalore",
+    "salary_min": 800000,
+    "salary_max": 1600000,
+    "job_type": "Full-time",
+    "description": "Build and maintain REST APIs using FastAPI. Experience with PostgreSQL and Docker required."
+  },
+  {
+    "id": 3,
+    "title": "ML Engineer Intern",
+    "company": "Swiggy",
+    "required_skills": ["python", "scikit-learn", "pandas", "numpy"],
+    "location": "Remote",
+    "salary_min": 30000,
+    "salary_max": 60000,
+    "job_type": "Internship",
+    "description": "Work on real ML problems using scikit-learn. Python and pandas experience required."
+  },
+  {
+    "id": 4,
+    "title": "React Developer",
+    "company": "Zoho",
+    "required_skills": ["javascript", "react", "typescript", "node.js"],
+    "location": "Chennai",
+    "salary_min": 600000,
+    "salary_max": 1200000,
+    "job_type": "Full-time",
+    "description": "Build responsive web apps with React and TypeScript. Node.js backend knowledge is a plus."
+  },
+  {
+    "id": 5,
+    "title": "DevOps Engineer",
+    "company": "Amazon",
+    "required_skills": ["docker", "kubernetes", "aws", "linux", "git"],
+    "location": "Hyderabad",
+    "salary_min": 1000000,
+    "salary_max": 2000000,
+    "job_type": "Full-time",
+    "description": "Manage cloud infrastructure using AWS and Kubernetes. Docker and Linux experience required."
+  }
+]
