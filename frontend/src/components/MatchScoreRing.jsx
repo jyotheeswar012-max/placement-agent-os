@@ -1,0 +1,25 @@
+import React from 'react'
+
+export default function MatchScoreRing({ score, size = 80 }) {
+  const radius = (size - 12) / 2
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference - (score / 100) * circumference
+  const color = score >= 80 ? '#22c55e' : score >= 60 ? '#eab308' : '#ef4444'
+
+  return (
+    <div className="relative inline-flex items-center justify-center">
+      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+        <circle cx={size/2} cy={size/2} r={radius} fill="none" stroke="#2e2e3e" strokeWidth="6" />
+        <circle
+          cx={size/2} cy={size/2} r={radius}
+          fill="none" stroke={color} strokeWidth="6"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          className="score-ring"
+        />
+      </svg>
+      <span className="absolute text-sm font-bold" style={{ color }}>{score}%</span>
+    </div>
+  )
+}
